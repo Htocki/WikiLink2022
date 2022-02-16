@@ -11,7 +11,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.utils import to_categorical
 
-def GetTextFromFile(name):
+def ReadTextFromFile(name):
   with open(name, 'r', encoding='utf-8') as file:
     text = file.read()
     text = text.replace('\ufeff', '') # Удаление спецсимвола кодировки
@@ -26,21 +26,11 @@ def CheckCommandLineArguments():
     exit(1)
   return sys.argv[1], sys.argv[2]
 
-def ConvertToTensor(text):
-  return 0;
-
-def GetOperatorName(number_as_text, tokenizer):
-  return 0;
-
-## Обрабока аргументов командной строки
-train, validation = CheckCommandLineArguments()
-
-## Определение обучающей выборки
-# Загрузка данных из файла
-text = GetTextFromFile(train)
-# Определение токенизатора
-max_words_count = 1000
-tokenizer = Tokenizer(
+# Разбивает входной текст на слова по пробелам и разделяет их на две 
+# категории (номера телефонов, именования операторов). Преобразует данные из
+# категорий в два тензора соотвественно входной (x_train) и выходной (y_train).
+def ConvertToTensor(text, max_words_count, input_words):
+  tokenizer = Tokenizer(
   # Максимальное количество слов (символов), которое вернет Tokenizer
   # (если элементов будет больше, то останутся наиболее повторяющиеся)
   num_words=max_words_count,
@@ -50,18 +40,27 @@ tokenizer = Tokenizer(
   split=' ', # Текст будет разделен на слова по пробелам
   # Тип разбивки: разбивка по словам
   char_level=False) # Разбивка по словам
-# Формирование токенов на основе частотности их появления в тексте
-tokenizer.fit_on_texts([text]) # зачем квадратные кавычки?
+  # Формирование токенов на основе частотности их появления в тексте
+  tokenizer.fit_on_texts([text]) # зачем квадратные кавычки?
+  ### Мутный кусок: начало 
+  data = tokenizer.texts_to_sequences([text])
+  res = to_categorical(data[0], num_classes=max_words_count)
+  n = res.shape[0] - input_words
+  x_train = np.array([res[i:i + input_words, :] for i in range(n)])
+  y_train = res[input_words:]
+  ### Мутный кусок: конец
+  return x_train, y_train;
 
-### Мутный кусок: начало 
-data = tokenizer.texts_to_sequences([text])
-res = to_categorical(data[0], num_classes=max_words_count)
-input_words=1
-n = res.shape[0] - input_words
-x_train = np.array([res[i:i + input_words, :] for i in range(n)])
-y_train = res[input_words:]
-### Мутный кусок: конец
+## Обрабока аргументов командной строки
+train, validation = CheckCommandLineArguments()
 
+## Определение обучающей выборки
+text = ReadTextFromFile(train)
+# Что это?
+max_words_count = 1000 # Почему 1000?
+input_words = 1 # Почему 1?
+# Необходимо разбить на две функции !
+x_train, y_train = ConvertToTensor(text, max_words_count, input_words)
 ## Определение структуры нейронной сети
 # Определение модели многослойного перцептрона с последовательно
 # расположенными слоями
@@ -69,7 +68,7 @@ model = Sequential()
 # Добавление входного слоя
 model.add(Input((input_words, max_words_count)))
 # Добавление простого рекуррентного слоя
-model.add(SimpleRNN(128, activation='tanh'))
+model.add(SimpleRNN(units=128, activation='tanh'))
 # Добавление вероятностного слоя
 model.add(Dense(max_words_count, activation='softmax'))
 model.summary()
