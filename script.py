@@ -11,8 +11,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.utils import to_categorical
 
-def ReadTextFromFile(name):
-  with open(name, 'r', encoding='utf-8') as file:
+def ReadTextFrom(file_name):
+  with open(file_name, 'r', encoding='utf-8') as file:
     text = file.read()
     text = text.replace('\ufeff', '') # Удаление спецсимвола кодировки
     text = re.sub('\n', ' ', text) # Замена всех переходов на новую
@@ -46,21 +46,21 @@ def ConvertToTensor(text, max_words_count, input_words):
   data = tokenizer.texts_to_sequences([text])
   res = to_categorical(data[0], num_classes=max_words_count)
   n = res.shape[0] - input_words
-  x_train = np.array([res[i:i + input_words, :] for i in range(n)])
-  y_train = res[input_words:]
+  input_train = np.array([res[i:i + input_words, :] for i in range(n)])
+  output_train = res[input_words:]
   ### Мутный кусок: конец
-  return x_train, y_train;
+  return input_train, output_train;
 
 ## Обрабока аргументов командной строки
-train, validation = CheckCommandLineArguments()
+train_file_name, validation_file_name = CheckCommandLineArguments()
 
 ## Определение обучающей выборки
-text = ReadTextFromFile(train)
+text = ReadTextFrom(train_file_name)
 # Что это?
 max_words_count = 1000 # Почему 1000?
 input_words = 1 # Почему 1?
 # Необходимо разбить на две функции !
-x_train, y_train = ConvertToTensor(text, max_words_count, input_words)
+input_train, output_train = ConvertToTensor(text, max_words_count, input_words)
 
 ## Определение структуры нейронной сети
 # Определение модели многослойного перцептрона с последовательно
@@ -87,9 +87,9 @@ model.compile(
 ## Обучение нейронной сети
 history = model.fit(
   # Входные значения обучающей выборки
-  x_train,
+  input_train,
   # Ожидаемые выходные значения
-  y_train,
+  output_train,
   # Что это?
   batch_size=32,
   # Число эпох(?)
