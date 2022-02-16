@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ## Задание
 # Реализовать и обучить нейронную сеть, которая определяет к какому
-# оператору (AOne, MTC, life, Beltelecom) относится указанный номер.
+# оператору (A1, MTC, life, Beltelecom) относится указанный номер.
 
 import re, sys
 import numpy as np
