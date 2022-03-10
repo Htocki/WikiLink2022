@@ -28,7 +28,7 @@ def CheckCommandLineArguments():
 
 # Разбивает входной текст на слова по пробелам и разделяет их на две 
 # категории (номера телефонов, именования операторов). Преобразует данные из
-# категорий в два тензора соотвественно входной (x_train) и выходной (y_train).
+# категорий в два тензора соотвественно входной и выходной.
 def ConvertToTensor(text, max_words_count, input_words):
   tokenizer = Tokenizer(
   # Максимальное количество слов (символов), которое вернет Tokenizer
@@ -38,32 +38,36 @@ def ConvertToTensor(text, max_words_count, input_words):
   filters='', # Фильтрация отсутствует
   # Определение символа-разделителя
   split=' ', # Текст будет разделен на слова по пробелам
-  # Тип разбивки: разбивка по словам
+  # Определение типа разбивки
   char_level=False) # Разбивка по словам
-  # Формирование токенов на основе частотности их появления в тексте
-  tokenizer.fit_on_texts([text]) # зачем квадратные кавычки?
-  ### Мутный кусок: начало 
+  # Обновление словаря на основании указанного текста
+  tokenizer.fit_on_texts([text])
+  # Преобразование текста в последовательность целых чисел. Каждому
+  # уникальному слову соответствует число
   data = tokenizer.texts_to_sequences([text])
+  # Конвертирует получившеюся последовательность чисел в бинарную матрицу
   res = to_categorical(data[0], num_classes=max_words_count)
+  # Разделение
   n = res.shape[0] - input_words
-  input_train = np.array([res[i:i + input_words, :] for i in range(n)])
-  output_train = res[input_words:]
-  ### Мутный кусок: конец
-  return input_train, output_train;
+  input_tensor = np.array([res[i:i + input_words, :] for i in range(n)])
+  output_tensor = res[input_words:]
+  return input_tensor, output_tensor
 
 ## Обрабока аргументов командной строки
 train_file_name, validation_file_name = CheckCommandLineArguments()
 
 ## Определение обучающей выборки
 text = ReadTextFrom(train_file_name)
+# Лимит сохраненных в словаре класса Tokenizer слов. Слова подбираются по
+# частоте их появления в тексте
+max_words_count = 250 # В исходном тексте чуть менее 250 слов
 # Что это?
-max_words_count = 1000 # Почему 1000?
 input_words = 1 # Почему 1?
 # Необходимо разбить на две функции !
-input_train, output_train = ConvertToTensor(text, max_words_count, input_words)
+input_tensor, output_tensor = ConvertToTensor(text, max_words_count, input_words)
 
 ## Определение структуры нейронной сети
-# Определение модели многослойного перцептрона с последовательно
+# Используется модель многослойного перцептрона с последовательно
 # расположенными слоями
 model = Sequential()
 # Добавление входного слоя
@@ -86,16 +90,14 @@ model.compile(
 
 ## Обучение нейронной сети
 history = model.fit(
-  # Входные значения обучающей выборки
-  input_train,
-  # Ожидаемые выходные значения
-  output_train,
-  # Что это?
-  batch_size=32,
-  # Число эпох(?)
+  # Входные данные
+  input_tensor,
+  # Ожидаемые данные
+  output_tensor,
+  # Количество эпох
   epochs=50,
-  # Вывод информации (метрик?) о процессе обучения нейросети
-  verbose=True)
+  # Режим детализации
+  verbose=1) # Отображается индикатор выполнения
 
 ## Передача нейронной сети данных на вход (с выводом результата)
 #print(model.predict(['''значение''']))
