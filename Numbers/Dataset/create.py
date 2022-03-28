@@ -146,5 +146,12 @@ for line in f_all:
       f.write(line)
       f.close()
     others_counter += 1
+  
+  if  mts_counter > count * 2 and \
+      a1_counter > count * 2 and \
+      live_counter > count * 2 and \
+      beltelecom_counter > count * 2 and \
+      others_counter > count * 2:
+    break
 
 f_all.close()
