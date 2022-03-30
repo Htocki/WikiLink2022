@@ -131,7 +131,14 @@ examples = [
     }\
   }',
   # Python
-  'print(loud_fruits)',
+
+  "n = int(input('Type a number, and its factorial will be printed: ')) \
+  if n < 0: \
+    raise ValueError('You must enter a non-negative integer') \
+  factorial = 1 \
+  for i in range(2, n + 1): \
+    factorial *= i \
+  print(factorial)",
   # Java
   'import java.util.*; \
   class GFG { \
@@ -167,3 +174,7 @@ examples = [
   document.getElementById("demo").innerHTML = x + y;']
 
 print('Result:\n', export_model.predict(examples))
+print('Class name 0: ', raw_test_ds.class_names[0])
+print('Class name 1: ', raw_test_ds.class_names[1])
+print('Class name 2: ', raw_test_ds.class_names[2])
+print('Class name 3: ', raw_test_ds.class_names[3])
