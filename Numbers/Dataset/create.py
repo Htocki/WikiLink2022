@@ -42,116 +42,88 @@ o = get_output_directory()
 
 f_all = open(str(i) + "/" + "all.txt", "r")
 
-mts_counter = 0
-a1_counter = 0
-live_counter = 0
-beltelecom_counter = 0
-others_counter = 0
+mts_train_counter = 0
+a1_train_counter = 0
+live_train_counter = 0
+beltelecom_train_counter = 0
+others_train_counter = 0
 
-train_dir = "/dataset/train/"
-test_dir = "/dataset/test/"
+mts_test_counter = 0
+a1_test_counter = 0
+live_test_counter = 0
+beltelecom_test_counter = 0
+others_test_counter = 0
 
-if not os.path.exists(str(o) + train_dir + "mts"):
-  os.makedirs(str(o) + train_dir + "mts")
-if not os.path.exists(str(o) + train_dir + "a1"):
-  os.makedirs(str(o) + train_dir + "a1")
-if not os.path.exists(str(o) + train_dir + "live"):
-  os.makedirs(str(o) + train_dir + "live")
-if not os.path.exists(str(o) + train_dir + "beltelecom"):
-  os.makedirs(str(o) + train_dir + "beltelecom")
-if not os.path.exists(str(o) + train_dir + "others"):
-  os.makedirs(str(o) + train_dir + "others")
+train_dir = str(o) + "/dataset/train/"
+test_dir = str(o) + "/dataset/test/"
 
-if not os.path.exists(str(o) + test_dir + "mts"):
-  os.makedirs(str(o) + test_dir + "mts")
-if not os.path.exists(str(o) + test_dir + "a1"):
-  os.makedirs(str(o) + test_dir + "a1")
-if not os.path.exists(str(o) + test_dir + "live"):
-  os.makedirs(str(o) + test_dir + "live")
-if not os.path.exists(str(o) + test_dir + "beltelecom"):
-  os.makedirs(str(o) + test_dir + "beltelecom")
-if not os.path.exists(str(o) + test_dir + "others"):
-  os.makedirs(str(o) + test_dir + "others")
+if not os.path.exists(train_dir + "mts"): os.makedirs(train_dir + "mts")
+if not os.path.exists(train_dir + "a1"): os.makedirs(train_dir + "a1")
+if not os.path.exists(train_dir + "live"): os.makedirs(train_dir + "live")
+if not os.path.exists(train_dir + "beltelecom"): os.makedirs(train_dir + "beltelecom")
+if not os.path.exists(train_dir + "others"): os.makedirs(train_dir + "others")
+
+if not os.path.exists(test_dir + "mts"): os.makedirs(test_dir + "mts")
+if not os.path.exists(test_dir + "a1"): os.makedirs(test_dir + "a1")
+if not os.path.exists(test_dir + "live"): os.makedirs(test_dir + "live")
+if not os.path.exists(test_dir + "beltelecom"): os.makedirs(test_dir + "beltelecom")
+if not os.path.exists(test_dir + "others"): os.makedirs(test_dir + "others")
 
 count = get_count()
 
+def create_file(path, counter, line):
+  file_name = str(counter) + ".txt"
+  f = open(path + "/" + file_name, "w+")
+  f.write(line)
+  f.close()
+
 for line in f_all:
   if is_mts(line):
-    if mts_counter < count:
-      path = str(o) + train_dir + "mts/"
-      name = str(mts_counter) + ".txt"
-      f = open(path + name, "w+")
-      f.write(line)
-      f.close()
-    elif count <= mts_counter < count * 2:
-      path = str(o) + test_dir + "mts/"
-      name = str(mts_counter) + ".txt"
-      f = open(path + name, "w+")
-      f.write(line)
-      f.close()
-    mts_counter += 1
+    if mts_train_counter < count:
+      create_file(train_dir + "mts", mts_train_counter, line)
+      mts_train_counter += 1
+    elif mts_train_counter == count and mts_test_counter < count:
+      create_file(test_dir + "mts", mts_test_counter, line)
+      mts_test_counter += 1
   elif is_a1(line):
-    if a1_counter < count:
-      path = str(o) + train_dir + "a1/"
-      name = str(a1_counter) + ".txt"
-      f = open(path + name, "w+")
-      f.write(line)
-      f.close()
-    elif count <= a1_counter < count * 2:
-      path = str(o) + test_dir + "a1/"
-      name = str(a1_counter) + ".txt"
-      f = open(path + name, "w+")
-      f.write(line)
-      f.close()
-    a1_counter += 1
+    if a1_train_counter < count:
+      create_file(train_dir + "a1", a1_train_counter, line)
+      a1_train_counter += 1
+    elif a1_train_counter == count and a1_test_counter < count:
+      create_file(test_dir + "a1", a1_test_counter, line)
+      a1_test_counter += 1
   elif is_live(line):
-    if live_counter < count:
-      path = str(o) + train_dir + "live/"
-      name = str(live_counter) + ".txt"
-      f = open(path + name, "w+")
-      f.write(line)
-      f.close()
-    elif count <= live_counter < count * 2:
-      path = str(o) + test_dir + "live/"
-      name = str(live_counter) + ".txt"
-      f = open(path + name, "w+")
-      f.write(line)
-      f.close()
-    live_counter += 1
+    if live_train_counter < count:
+      create_file(train_dir + "live", live_train_counter, line)
+      live_train_counter += 1
+    elif live_train_counter == count and live_test_counter < count:
+      create_file(test_dir + "live", live_test_counter, line)
+      live_test_counter += 1
   elif is_beltelecom(line):
-    if beltelecom_counter < count:
-      path = str(o) + train_dir + "beltelecom/"
-      name = str(beltelecom_counter) + ".txt"
-      f = open(path + name, "w+")
-      f.write(line)
-      f.close()
-    elif count <= beltelecom_counter < count * 2:
-      path = str(o) + test_dir + "beltelecom/"
-      name = str(beltelecom_counter) + ".txt"
-      f = open(path + name, "w+")
-      f.write(line)
-      f.close()
-    beltelecom_counter += 1
+    if beltelecom_train_counter < count:
+      create_file(train_dir + "beltelecom", beltelecom_train_counter, line)
+      beltelecom_train_counter += 1
+    elif beltelecom_train_counter == count and beltelecom_test_counter < count:
+      create_file(test_dir + "beltelecom", beltelecom_test_counter, line)
+      beltelecom_test_counter += 1
   else:
-    if others_counter < count:
-      path = str(o) + train_dir + "others/"
-      name = str(others_counter) + ".txt"
-      f = open(path + name, "w+")
-      f.write(line)
-      f.close()
-    elif count <= others_counter < count * 2:
-      path = str(o) + test_dir + "others/"
-      name = str(others_counter) + ".txt"
-      f = open(path + name, "w+")
-      f.write(line)
-      f.close()
-    others_counter += 1
+    if others_train_counter < count:
+      create_file(train_dir + "others", others_train_counter, line)
+      others_train_counter += 1
+    elif others_train_counter == count and others_test_counter < count:
+      create_file(test_dir + "others", others_test_counter, line)
+      others_test_counter += 1
   
-  if  mts_counter > count * 2 and \
-      a1_counter > count * 2 and \
-      live_counter > count * 2 and \
-      beltelecom_counter > count * 2 and \
-      others_counter > count * 2:
+  if  mts_train_counter == count and \
+      a1_train_counter == count and \
+      live_train_counter == count and \
+      beltelecom_train_counter == count and \
+      others_train_counter == count and \
+      mts_test_counter == count and \
+      a1_test_counter == count and \
+      live_test_counter == count and \
+      beltelecom_test_counter == count and \
+      others_test_counter == count:
     break
 
 f_all.close()
