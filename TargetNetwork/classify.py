@@ -78,7 +78,11 @@ model.compile(
   optimizer='sgd',
   metrics=[
     tf.keras.metrics.AUC(from_logits=True),
-    tf.keras.metrics.BinaryAccuracy(threshold=0.0)])
+    #tf.keras.metrics.FalseNegatives(),
+    #tf.keras.metrics.FalsePositives(),
+    #tf.keras.metrics.TrueNegatives(),
+    #tf.keras.metrics.TruePositives()
+])
 
 epochs = 500
 history = model.fit(
@@ -86,24 +90,20 @@ history = model.fit(
   validation_data=val_ds,
   epochs=epochs)
 
-loss, auc, binary_accuracy = model.evaluate(test_ds)
+loss, auc = model.evaluate(test_ds)
 
 print('Export model loss: ', loss)
 print('Export model auc: ', auc)
-print('Export model accaracy: ', binary_accuracy)
-
 
 # Графики
 history_dict = history.history
 history_dict.keys()
 
-acc = history_dict['binary_accuracy']
-val_acc = history_dict['val_binary_accuracy']
 loss = history_dict['loss']
 val_loss = history_dict['val_loss']
 auc = history_dict['auc']
 val_auc = history_dict['val_auc']
-epochs = range(1, len(acc) + 1)
+epochs = range(1, epochs + 1)
 
 # График потерь
 plt.plot(epochs, loss, 'r', label='Training loss')
@@ -113,16 +113,6 @@ plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.grid(axis = 'both')
 plt.legend()
-plt.show()
-
-# График точности
-plt.plot(epochs, acc, 'r', label='Training acc')
-plt.plot(epochs, val_acc, 'b', label='Validation acc')
-plt.title('Training and validation accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.grid(axis = 'both')
-plt.legend(loc='lower right')
 plt.show()
 
 # График AUC
@@ -145,7 +135,6 @@ export_model.compile(
   optimizer="sgd",
   metrics=tf.keras.metrics.AUC())
 
-# Test it with `raw_test_ds`, which yields raw strings
 loss, auc = export_model.evaluate(raw_test_ds)
 print('')
 print('Export model loss: ', loss)
