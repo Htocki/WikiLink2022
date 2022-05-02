@@ -92,8 +92,8 @@ history = model.fit(
 
 loss, auc = model.evaluate(test_ds)
 
-print('Export model loss: ', loss)
-print('Export model auc: ', auc)
+print('Model loss: ', loss)
+print('Model auc: ', auc)
 
 # Графики
 history_dict = history.history
